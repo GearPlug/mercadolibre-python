@@ -8,3 +8,7 @@ class InvalidSite(BaseError):
 
 class TokenExpired(BaseError):
     pass
+
+
+class InvalidPictureParameter(BaseError):
+    pass

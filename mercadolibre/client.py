@@ -28,7 +28,7 @@ class Client(object):
         self.client_id = client_id
         self.client_secret = client_secret
         self.access_token = None
-        self.refresh_token = None
+        self._refresh_token = None
         self.user_id = None
         self.expires_in = None
         self.expires_at = None
@@ -61,14 +61,14 @@ class Client(object):
             'client_id': self.client_id,
             'client_secret': self.client_secret,
             'grant_type': 'refresh_token',
-            'refresh_token': self.refresh_token,
+            'refresh_token': self._refresh_token,
         }
         return self._token(self._post('/oauth/token', params=params))
 
     def set_token(self, token):
         if isinstance(token, dict):
             self.access_token = token['access_token']
-            self.refresh_token = token['refresh_token']
+            self._refresh_token = token['refresh_token']
             self.user_id = token['user_id']
             self.expires_in = token['expires_in']
             if 'expires_at' in token:
@@ -100,28 +100,29 @@ class Client(object):
     def _put(self, endpoint, params=None, data=None):
         return self._request('PUT', endpoint, params, data)
 
-    @valid_token
     def _request(self, method, endpoint, params=None, data=None):
-        if params:
-            params['access_token'] = self.access_token
-        else:
-            params = {'access_token': self.access_token}
-        response = requests.request(method, self.BASE_URL + endpoint, params=params, data=data)
+        response = requests.request(method, self.BASE_URL + endpoint, params=params, json=data)
         return self._parse(response)
 
     def _parse(self, response):
-        print(response.json())
-        print(response.status_code)
+        if not isinstance(response, (dict, list)):
+            return response.json()
         return response
 
+    def _get_params(self):
+        return {'access_token': self.access_token}
+
+    @valid_token
     def me(self):
         """Returns account information about the authenticated user.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/me'))
+        params = self._get_params()
+        return self._parse(self._get('/users/me', params=params))
 
+    @valid_token
     def get_user(self, customer_id):
         """User account information.
 
@@ -129,13 +130,15 @@ class Client(object):
             customer_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/{}'.format(customer_id)))
+        params = self._get_params()
+        return self._parse(self._get('/users/{}'.format(customer_id), params=params))
 
     def update_user(self):
         raise NotImplementedError
 
+    @valid_token
     def get_user_address(self, customer_id):
         """Returns addresses registered by the user.
 
@@ -143,10 +146,12 @@ class Client(object):
             customer_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/{}/addresses'.format(customer_id)))
+        params = self._get_params()
+        return self._parse(self._get('/users/{}/addresses'.format(customer_id), params=params))
 
+    @valid_token
     def get_user_accepted_payment_methods(self, customer_id):
         """Returns payment methods accepted by a seller to collect its operations.
 
@@ -154,10 +159,12 @@ class Client(object):
             customer_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/{}/accepted_payment_methods'.format(customer_id)))
+        params = self._get_params()
+        return self._parse(self._get('/users/{}/accepted_payment_methods'.format(customer_id), params=params))
 
+    @valid_token
     def get_application(self, application_id):
         """Returns information about the application.
 
@@ -165,10 +172,12 @@ class Client(object):
             application_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/applications/{}'.format(application_id)))
+        params = self._get_params()
+        return self._parse(self._get('/applications/{}'.format(application_id), params=params))
 
+    @valid_token
     def get_user_brands(self, user_id):
         """This resource retrieves brands associated to an user_id. The official_store_id attribute identifies a store.
 
@@ -176,10 +185,12 @@ class Client(object):
             user_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/{}/brands'.format(user_id)))
+        params = self._get_params()
+        return self._parse(self._get('/users/{}/brands'.format(user_id), params=params))
 
+    @valid_token
     def get_user_classifields_promotion_packs(self, user_id):
         """Manage user promotion packs.
 
@@ -187,20 +198,23 @@ class Client(object):
             user_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/users/{}/classifieds_promotion_packs'.format(user_id)))
+        params = self._get_params()
+        return self._parse(self._get('/users/{}/classifieds_promotion_packs'.format(user_id), params=params))
 
     def create_user_classifields_promotion_packs(self):
         raise NotImplementedError
 
+    @valid_token
     def get_project(self, project_id):
         """Manage projects.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/projects/{}'.format(project_id)))
+        params = self._get_params()
+        return self._parse(self._get('/projects/{}'.format(project_id), params=params))
 
     def create_project(self):
         raise NotImplementedError
@@ -211,25 +225,30 @@ class Client(object):
     def delete_project(self):
         raise NotImplementedError
 
+    @valid_token
     def get_my_feeds(self):
         """Notifications history.
 
         Returns:
-
+            A dict.
         """
         params = {
             'app_id': self.client_id
         }
+        params.update(self._get_params())
         return self._parse(self._get('/myfeeds', params=params))
 
+    @valid_token
     def get_sites(self):
         """Retrieves information about the sites where MercadoLibre runs.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/sites'))
+        params = self._get_params()
+        return self._parse(self._get('/sites', params=params))
 
+    @valid_token
     def get_listing_types(self, site_id):
         """Returns information about listing types.
 
@@ -237,10 +256,12 @@ class Client(object):
             site_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/sites/{}/listing_types'.format(site_id)))
+        params = self._get_params()
+        return self._parse(self._get('/sites/{}/listing_types'.format(site_id), params=params))
 
+    @valid_token
     def get_listing_exposures(self, site_id):
         """Returns different exposure levels associated with all listing types in MercadoLibre.
 
@@ -248,10 +269,12 @@ class Client(object):
             site_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/sites/{}/listing_exposures'.format(site_id)))
+        params = self._get_params()
+        return self._parse(self._get('/sites/{}/listing_exposures'.format(site_id), params=params))
 
+    @valid_token
     def get_categories(self, site_id):
         """	Returns available categories in the site.
 
@@ -259,10 +282,12 @@ class Client(object):
             site_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/sites/{}/categories'.format(site_id)))
+        params = self._get_params()
+        return self._parse(self._get('/sites/{}/categories'.format(site_id), params=params))
 
+    @valid_token
     def get_category(self, category_id):
         """Returns information about a category.
 
@@ -270,10 +295,12 @@ class Client(object):
             category_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/categories/{}'.format(category_id)))
+        params = self._get_params()
+        return self._parse(self._get('/categories/{}'.format(category_id), params=params))
 
+    @valid_token
     def get_category_attributes(self, category_id):
         """Displays attributes and rules over them in order to describe the items that are stored in each category.
 
@@ -281,26 +308,32 @@ class Client(object):
             category_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/categories/{}/attributes'.format(category_id)))
+        params = self._get_params()
+        return self._parse(self._get('/categories/{}/attributes'.format(category_id), params=params))
 
+    @valid_token
     def get_countries(self):
         """Returns countries information.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/countries'))
+        params = self._get_params()
+        return self._parse(self._get('/countries', params=params))
 
+    @valid_token
     def get_country(self, country_id):
         """Returns country information by country_id.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/countries/{}'.format(country_id)))
+        params = self._get_params()
+        return self._parse(self._get('/countries/{}'.format(country_id), params=params))
 
+    @valid_token
     def get_state(self, state_id):
         """	Returns state information.
 
@@ -308,10 +341,12 @@ class Client(object):
             state_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/states/{}'.format(state_id)))
+        params = self._get_params()
+        return self._parse(self._get('/states/{}'.format(state_id), params=params))
 
+    @valid_token
     def get_city(self, city_id):
         """Returns city information.
 
@@ -319,18 +354,22 @@ class Client(object):
             city_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/cities/{}'.format(city_id)))
+        params = self._get_params()
+        return self._parse(self._get('/cities/{}'.format(city_id), params=params))
 
+    @valid_token
     def get_currencies(self):
         """	Returns information about all available currencies in MercadoLibre.
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/currencies'))
+        params = self._get_params()
+        return self._parse(self._get('/currencies', params=params))
 
+    @valid_token
     def get_currency(self, currency_id):
         """Returns information about available currencies in MercadoLibre by currency_id.
 
@@ -338,10 +377,57 @@ class Client(object):
             currency_id:
 
         Returns:
-
+            A dict.
         """
-        return self._parse(self._get('/currencies/{}'.format(currency_id)))
+        params = self._get_params()
+        return self._parse(self._get('/currencies/{}'.format(currency_id), params=params))
 
+    @valid_token
     def list_item(self, title, condition, category_id, price, currency_id, available_quantity, buying_mode,
-                  listing_type_id, video_id, warranty, pictures, description=None, **kwargs):
-        return self._parse(self._post('/items'))
+                  listing_type_id, warranty, description=None, video_id=None, pictures=None, **kwargs):
+        """
+
+        Args:
+            title:
+            condition:
+            category_id:
+            price:
+            currency_id:
+            available_quantity:
+            buying_mode:
+            listing_type_id:
+            warranty:
+            description:
+            video_id:
+            pictures:
+            **kwargs:
+
+        Returns:
+            A dict.
+        """
+        data = {
+            'title': title,
+            'condition': condition,
+            'category_id': category_id,
+            'price': price,
+            'currency_id': currency_id,
+            'available_quantity': available_quantity,
+            'buying_mode': buying_mode,
+            'listing_type_id': listing_type_id,
+            'warranty': warranty,
+        }
+        if description:
+            data['description'] = description
+        if video_id:
+            data['video_id'] = video_id
+        if pictures:
+            if isinstance(pictures, str):
+                pictures = [{'source': pictures}]
+            elif isinstance(pictures, list):
+                pictures = [{'source': p} for p in pictures]
+            else:
+                raise exceptions.InvalidPictureParameter()
+            data['pictures'] = pictures
+        data.update(kwargs)
+        params = self._get_params()
+        return self._parse(self._post('/items', params=params, data=data))
