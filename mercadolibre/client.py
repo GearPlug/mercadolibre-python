@@ -10,7 +10,7 @@ class Client(object):
 
     auth_urls = {
         'MLA': "https://auth.mercadolibre.com.ar",  # Argentina
-        'MLB': "https://auth.mercadolivre.com.br",  # Brasil
+        'MLB': "https://auth.mercadolibre.com.br",  # Brasil
         'MCO': "https://auth.mercadolibre.com.co",  # Colombia
         'MCR': "https://auth.mercadolibre.com.cr",  # Costa Rica
         'MEC': "https://auth.mercadolibre.com.ec",  # Ecuador
@@ -37,7 +37,7 @@ class Client(object):
         except KeyError as e:
             raise exceptions.InvalidSite()
 
-    def get_authorization_url(self, redirect_uri):
+    def authorization_url(self, redirect_uri):
         params = {
             'client_id': self.client_id,
             'response_type': 'code',
@@ -123,46 +123,46 @@ class Client(object):
         return self._parse(self._get('/users/me', params=params))
 
     @valid_token
-    def get_user(self, customer_id):
+    def get_user(self, user_id):
         """User account information.
 
         Args:
-            customer_id:
+            user_id:
 
         Returns:
             A dict.
         """
         params = self._get_params()
-        return self._parse(self._get('/users/{}'.format(customer_id), params=params))
+        return self._parse(self._get('/users/{}'.format(user_id), params=params))
 
     def update_user(self):
         raise NotImplementedError
 
     @valid_token
-    def get_user_address(self, customer_id):
+    def get_user_address(self, user_id):
         """Returns addresses registered by the user.
 
         Args:
-            customer_id:
+            user_id:
 
         Returns:
-            A dict.
+            A list.
         """
         params = self._get_params()
-        return self._parse(self._get('/users/{}/addresses'.format(customer_id), params=params))
+        return self._parse(self._get('/users/{}/addresses'.format(user_id), params=params))
 
     @valid_token
-    def get_user_accepted_payment_methods(self, customer_id):
+    def get_user_accepted_payment_methods(self, user_id):
         """Returns payment methods accepted by a seller to collect its operations.
 
         Args:
-            customer_id:
+            user_id:
 
         Returns:
             A dict.
         """
         params = self._get_params()
-        return self._parse(self._get('/users/{}/accepted_payment_methods'.format(customer_id), params=params))
+        return self._parse(self._get('/users/{}/accepted_payment_methods'.format(user_id), params=params))
 
     @valid_token
     def get_application(self, application_id):
@@ -243,7 +243,7 @@ class Client(object):
         """Retrieves information about the sites where MercadoLibre runs.
 
         Returns:
-            A dict.
+            A list.
         """
         params = self._get_params()
         return self._parse(self._get('/sites', params=params))
@@ -282,7 +282,7 @@ class Client(object):
             site_id:
 
         Returns:
-            A dict.
+            A list.
         """
         params = self._get_params()
         return self._parse(self._get('/sites/{}/categories'.format(site_id), params=params))
@@ -318,7 +318,7 @@ class Client(object):
         """Returns countries information.
 
         Returns:
-            A dict.
+            A list.
         """
         params = self._get_params()
         return self._parse(self._get('/countries', params=params))
@@ -364,7 +364,7 @@ class Client(object):
         """	Returns information about all available currencies in MercadoLibre.
 
         Returns:
-            A dict.
+            A list.
         """
         params = self._get_params()
         return self._parse(self._get('/currencies', params=params))
