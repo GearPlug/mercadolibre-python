@@ -401,7 +401,7 @@ class Client(object):
         _params = {'access_token': self.access_token}
         if params:
             _params.update(params)
-        response = requests.request(method, self.BASE_URL + endpoint, params=params, **kwargs)
+        response = requests.request(method, self.BASE_URL + endpoint, params=_params, **kwargs)
         return self._parse(response)
 
     def _parse(self, response):
