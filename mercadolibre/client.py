@@ -82,35 +82,6 @@ class Client(object):
         else:
             return None
 
-    def _token(self, response):
-        if 'expires_in' in response:
-            expires_in = response['expires_in']
-            expires_at = time.time() + int(expires_in)
-            response['expires_at'] = expires_at
-            self.expires_at = expires_at
-        return response
-
-    def _get(self, endpoint, params=None):
-        return self._request('GET', endpoint, params)
-
-    def _post(self, endpoint, params=None, data=None):
-        return self._request('POST', endpoint, params, data)
-
-    def _put(self, endpoint, params=None, data=None):
-        return self._request('PUT', endpoint, params, data)
-
-    def _request(self, method, endpoint, params=None, data=None):
-        response = requests.request(method, self.BASE_URL + endpoint, params=params, json=data)
-        return self._parse(response)
-
-    def _parse(self, response):
-        if not isinstance(response, (dict, list)):
-            return response.json()
-        return response
-
-    def _get_params(self):
-        return {'access_token': self.access_token}
-
     @valid_token
     def me(self):
         """Returns account information about the authenticated user.
@@ -118,8 +89,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/me', params=params))
+        return self._get('/users/me')
 
     @valid_token
     def get_user(self, user_id):
@@ -131,8 +101,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/{}'.format(user_id), params=params))
+        return self._get('/users/{}'.format(user_id))
 
     def update_user(self):
         raise NotImplementedError
@@ -147,8 +116,7 @@ class Client(object):
         Returns:
             A list.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/{}/addresses'.format(user_id), params=params))
+        return self._get('/users/{}/addresses'.format(user_id))
 
     @valid_token
     def get_user_accepted_payment_methods(self, user_id):
@@ -160,8 +128,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/{}/accepted_payment_methods'.format(user_id), params=params))
+        return self._get('/users/{}/accepted_payment_methods'.format(user_id))
 
     @valid_token
     def get_application(self, application_id):
@@ -173,8 +140,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/applications/{}'.format(application_id), params=params))
+        return self._get('/applications/{}'.format(application_id))
 
     @valid_token
     def get_user_brands(self, user_id):
@@ -186,8 +152,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/{}/brands'.format(user_id), params=params))
+        return self._get('/users/{}/brands'.format(user_id))
 
     @valid_token
     def get_user_classifields_promotion_packs(self, user_id):
@@ -199,8 +164,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/users/{}/classifieds_promotion_packs'.format(user_id), params=params))
+        return self._get('/users/{}/classifieds_promotion_packs'.format(user_id))
 
     def create_user_classifields_promotion_packs(self):
         raise NotImplementedError
@@ -212,8 +176,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/projects/{}'.format(project_id), params=params))
+        return self._get('/projects/{}'.format(project_id))
 
     def create_project(self):
         raise NotImplementedError
@@ -234,8 +197,7 @@ class Client(object):
         params = {
             'app_id': self.client_id
         }
-        params.update(self._get_params())
-        return self._parse(self._get('/myfeeds', params=params))
+        return self._get('/myfeeds', params=params)
 
     @valid_token
     def get_sites(self):
@@ -244,8 +206,7 @@ class Client(object):
         Returns:
             A list.
         """
-        params = self._get_params()
-        return self._parse(self._get('/sites', params=params))
+        return self._get('/sites')
 
     @valid_token
     def get_listing_types(self, site_id):
@@ -257,8 +218,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/sites/{}/listing_types'.format(site_id), params=params))
+        return self._get('/sites/{}/listing_types'.format(site_id))
 
     @valid_token
     def get_listing_exposures(self, site_id):
@@ -270,8 +230,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/sites/{}/listing_exposures'.format(site_id), params=params))
+        return self._get('/sites/{}/listing_exposures'.format(site_id))
 
     @valid_token
     def get_categories(self, site_id):
@@ -283,8 +242,7 @@ class Client(object):
         Returns:
             A list.
         """
-        params = self._get_params()
-        return self._parse(self._get('/sites/{}/categories'.format(site_id), params=params))
+        return self._get('/sites/{}/categories'.format(site_id))
 
     @valid_token
     def get_category(self, category_id):
@@ -296,8 +254,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/categories/{}'.format(category_id), params=params))
+        return self._get('/categories/{}'.format(category_id))
 
     @valid_token
     def get_category_attributes(self, category_id):
@@ -309,8 +266,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/categories/{}/attributes'.format(category_id), params=params))
+        return self._get('/categories/{}/attributes'.format(category_id))
 
     @valid_token
     def get_countries(self):
@@ -319,8 +275,7 @@ class Client(object):
         Returns:
             A list.
         """
-        params = self._get_params()
-        return self._parse(self._get('/countries', params=params))
+        return self._get('/countries')
 
     @valid_token
     def get_country(self, country_id):
@@ -329,8 +284,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/countries/{}'.format(country_id), params=params))
+        return self._get('/countries/{}'.format(country_id))
 
     @valid_token
     def get_state(self, state_id):
@@ -342,8 +296,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/states/{}'.format(state_id), params=params))
+        return self._get('/states/{}'.format(state_id))
 
     @valid_token
     def get_city(self, city_id):
@@ -355,8 +308,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/cities/{}'.format(city_id), params=params))
+        return self._get('/cities/{}'.format(city_id))
 
     @valid_token
     def get_currencies(self):
@@ -365,8 +317,7 @@ class Client(object):
         Returns:
             A list.
         """
-        params = self._get_params()
-        return self._parse(self._get('/currencies', params=params))
+        return self._get('/currencies')
 
     @valid_token
     def get_currency(self, currency_id):
@@ -378,8 +329,7 @@ class Client(object):
         Returns:
             A dict.
         """
-        params = self._get_params()
-        return self._parse(self._get('/currencies/{}'.format(currency_id), params=params))
+        return self._get('/currencies/{}'.format(currency_id))
 
     @valid_token
     def list_item(self, title, condition, category_id, price, currency_id, available_quantity, buying_mode,
@@ -428,5 +378,35 @@ class Client(object):
                 raise exceptions.InvalidPictureParameter()
             data['pictures'] = pictures
         data.update(kwargs)
-        params = self._get_params()
-        return self._parse(self._post('/items', params=params, data=data))
+        return self._post('/items', json=data)
+
+    def _token(self, response):
+        if 'expires_in' in response:
+            expires_in = response['expires_in']
+            expires_at = time.time() + int(expires_in)
+            response['expires_at'] = expires_at
+            self.expires_at = expires_at
+        return response
+
+    def _get(self, endpoint, **kwargs):
+        return self._request('GET', endpoint, **kwargs)
+
+    def _post(self, endpoint, **kwargs):
+        return self._request('POST', endpoint, **kwargs)
+
+    def _put(self, endpoint, **kwargs):
+        return self._request('PUT', endpoint, **kwargs)
+
+    def _request(self, method, endpoint, params=None, **kwargs):
+        _params = {'access_token': self.access_token}
+        if params:
+            _params.update(params)
+        response = requests.request(method, self.BASE_URL + endpoint, params=params, **kwargs)
+        return self._parse(response)
+
+    def _parse(self, response):
+        if 'application/json' in response.headers['Content-Type']:
+            r = response.json()
+        else:
+            r = response.text
+        return r
