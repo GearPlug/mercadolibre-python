@@ -67,12 +67,11 @@ class Client(object):
 
     def set_token(self, token):
         if isinstance(token, dict):
-            self.access_token = token['access_token']
-            self._refresh_token = token['refresh_token']
-            self.user_id = token['user_id']
-            self.expires_in = token['expires_in']
-            if 'expires_at' in token:
-                self.expires_at = token['expires_at']
+            self.access_token = token.get('access_token', None)
+            self._refresh_token = token.get('refresh_token', None)
+            self.user_id = token.get('user_id', None)
+            self.expires_in = token.get('expires_in', None)
+            self.expires_at = token.get('expires_at', None)
         else:
             self.access_token = token
 
