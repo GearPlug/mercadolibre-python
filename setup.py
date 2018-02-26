@@ -7,7 +7,7 @@ def read(fname):
 
 
 setup(name='mercadolibre-python',
-      version='0.2',
+      version='0.2.1',
       description='API wrapper for MercadoLibre written in Python',
       long_description=read('README.md'),
       url='https://github.com/GearPlug/mercadolibre-python',
