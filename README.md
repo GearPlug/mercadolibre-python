@@ -69,11 +69,6 @@ Get project information
 response = client.get_project('PROJECT_ID')
 ```
 
-Get project information
-```
-response = client.get_project('PROJECT_ID')
-```
-
 Get sites
 ```
 response = client.get_sites(')
