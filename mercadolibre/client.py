@@ -397,6 +397,9 @@ class Client(object):
     def _put(self, endpoint, **kwargs):
         return self._request('PUT', endpoint, **kwargs)
 
+    def _delete(self, endpoint, **kwargs):
+        return self._request('DELETE', endpoint, **kwargs)
+        
     def _request(self, method, endpoint, params=None, **kwargs):
         _params = {'access_token': self.access_token}
         if params:
