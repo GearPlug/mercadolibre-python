@@ -11,7 +11,7 @@ pip install mercadolibre-python
 ```
 from mercadolibre.client import Client
 
-client = Client('CLIENT_ID, 'CLIENT_SECRET', site='MCO')
+client = Client('CLIENT_ID', 'CLIENT_SECRET', site='MCO')
 ```
 
 Get authorization url
