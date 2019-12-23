@@ -10,7 +10,7 @@ class Client(object):
 
     auth_urls = {
         'MLA': "https://auth.mercadolibre.com.ar",  # Argentina
-        'MLB': "https://auth.mercadolibre.com.br",  # Brasil
+        'MLB': "https://auth.mercadolivre.com.br",  # Brasil
         'MCO': "https://auth.mercadolibre.com.co",  # Colombia
         'MCR': "https://auth.mercadolibre.com.cr",  # Costa Rica
         'MEC': "https://auth.mercadolibre.com.ec",  # Ecuador
